@@ -1,1 +1,578 @@
-
+local P=game:GetService("Players")
+local RS=game:GetService("ReplicatedStorage")
+local RN=game:GetService("RunService")
+local DB=game:GetService("Debris")
+local pl=P.LocalPlayer
+local ch=workspace:WaitForChild("Characters")
+local ef=workspace:WaitForChild("Effects")
+local AN=RS:WaitForChild("Animations")
+local animPath=AN.Itadori.UltimateEnchain
+local wcsAnim=AN.Heian.WCS
+local pbAnim=AN.Choso.PiercingBlood
+local rsAnim=AN.Choso.RedScale
+local cnAnim=AN.Choso.SupernovaCounter
+local beAnim=AN.Choso.BloodEdge
+local SID="rbxassetid://137783553081376"
+local MID="rbxassetid://77398613189051"
+local OM="102678081371850"
+local OT="97044826568383"
+local OS="rbxassetid://71335937838922"
+local VID="78067196582421"
+local RED=Color3.fromRGB(20,0,0)
+local BLK=Color3.fromRGB(0,0,0)
+local playing=false
+local fw=nil
+local oxA=false
+local vt=nil
+local avfx={}
+local sac=nil
+local pm=nil
+local cv1=nil
+local cv2a=nil
+local cv2b=nil
+local v2s=false
+local cc=nil
+local beMap={}
+local ok,ob=pcall(function()return game:GetObjects("rbxassetid://98542441090063")[1]end)
+if ok and ob then
+	for _,v in ipairs(ob:GetDescendants())do if v.Name=="Attachment" then pcall(function()v:Destroy()end)end end
+	pm=ob
+end
+local fp=RS:FindFirstChild("Utils")and RS.Utils:FindFirstChild("Choso")and RS.Utils.Choso:FindFirstChild("Flash")
+if fp then fp:Destroy()end
+local function c1()if cv1 then pcall(function()cv1:Destroy()end)cv1=nil end end
+local function c2()
+	if cv2a then pcall(function()cv2a:Destroy()end)cv2a=nil end
+	if cv2b then pcall(function()cv2b:Destroy()end)cv2b=nil end
+end
+local function SS(p,id,v)local s=Instance.new("Sound")s.SoundId="rbxassetid://"..id s.Volume=v or 1 s.Parent=p s:Play()DB:AddItem(s,5)end
+local function SF(cf,id)
+	local sp=Instance.new("Part")sp.Anchored=true sp.CanCollide=false sp.Transparency=1 sp.Size=Vector3.new(.1,.1,.1)sp.CFrame=cf sp.Parent=workspace
+	local s=Instance.new("Sound")s.SoundId="rbxassetid://"..id s.Volume=10 s.Parent=sp s:Play()
+	s.Ended:Connect(function()sp:Destroy()end)DB:AddItem(sp,30)
+end
+local function LBF(n)
+	local ok2,m=pcall(function()return game:GetObjects("rbxassetid://84304531159451")end)
+	if not(ok2 and m and #m>0)then return nil end
+	local f=m[1]:FindFirstChild(n)
+	if f then f.Parent=workspace end
+	return f
+end
+local function AT(o,p,w)
+	if not o or not p then return end
+	local rp=o:IsA("BasePart")and o or(o:IsA("Model")and(o.PrimaryPart or o:FindFirstChildWhichIsA("BasePart")))
+	if not rp then return end
+	rp.Anchored=not w rp.CanCollide=false rp.CFrame=p.CFrame
+	if w then
+		local wc=Instance.new("WeldConstraint")wc.Part0=p wc.Part1=rp wc.Parent=rp
+		for _,v in ipairs(o:GetDescendants())do pcall(function()if v:IsA("BasePart")or v:IsA("MeshPart")then v.Anchored=false v.CanCollide=false end end)end
+	end
+end
+local function sCT()
+	if cc then cc:Disconnect()end
+	for _,c in ipairs(ef:GetChildren())do if c.Name=="CombatTrail" then pcall(function()c:Destroy()end)end end
+	cc=ef.ChildAdded:Connect(function(c)if c.Name=="CombatTrail" then task.wait()pcall(function()c:Destroy()end)end end)
+end
+local function xCT()if cc then cc:Disconnect()cc=nil end end
+local function sV2(ra,t)
+	c1()c2()v2s=true
+	local b1=LBF("Black Flash (Fist incoming)")
+	if b1 and ra then cv2a=b1 AT(b1,ra,true)DB:AddItem(b1,1.5)task.delay(1.5,function()if cv2a==b1 then cv2a=nil end end)end
+	local b2=LBF("Black Flash")
+	if b2 and t then cv2b=b2 AT(b2,t,true)DB:AddItem(b2,1)task.delay(1,function()if cv2b==b2 then cv2b=nil end end)end
+	SF(ra and ra.CFrame or t and t.CFrame or CFrame.new(),"138418591134998")
+end
+local function sV1(t)
+	if v2s then return end c1()
+	local ok2,o=pcall(function()return game:GetObjects("rbxassetid://98542441090063")[1]end)
+	if not(ok2 and o)then return end
+	o.Parent=workspace cv1=o
+	local function ap(p)
+		if p:IsA("BasePart")or p:IsA("MeshPart")then p.Anchored=true p.CanCollide=false p.CFrame=t.CFrame p.Size=Vector3.new(.01,.01,.01)end
+		if p:IsA("SpecialMesh")or p:IsA("BlockMesh")then p.Scale=Vector3.new(.001,.001,.001)end
+	end
+	ap(o)for _,v in ipairs(o:GetDescendants())do pcall(function()ap(v)end)end
+	SS(o,"137525796723996",10)DB:AddItem(o,.6)task.delay(.6,function()if cv1==o then cv1=nil end end)
+end
+local function sM1(p)
+	if not pm then return end
+	local c=pm:Clone()c.Parent=workspace
+	if c:IsA("BasePart")or c:IsA("MeshPart")then c.CFrame=p.CFrame c.Anchored=true c.CanCollide=false c.Size=Vector3.new(.1,.1,.1)end
+	for _,v in ipairs(c:GetDescendants())do pcall(function()
+		if v:IsA("BasePart")or v:IsA("MeshPart")then v.CFrame=p.CFrame v.Anchored=true v.CanCollide=false v.Size=Vector3.new(.1,.1,.1)end
+		if v:IsA("SpecialMesh")or v:IsA("BlockMesh")then v.Scale=Vector3.new(.01,.01,.01)end
+	end)end
+	SS(c,"130094147730039",1)DB:AddItem(c,.5)
+end
+print("inky")
+local function LVT()
+	if vt then return vt end
+	local s,m=pcall(function()return game:GetObjects("rbxassetid://"..VID)end)
+	if not(s and m and #m>0)then return nil end
+	vt=m[1]
+	local dv=vt:FindFirstChild("Dismantle Vfx")
+	if dv then
+		for _,c in ipairs(dv:GetChildren())do if c.Name~="Attachment" then c:Destroy()end end
+		local att=dv:FindFirstChild("Attachment")
+		if att then for _,c in ipairs(att:GetChildren())do if c.Name~="B" then c:Destroy()end end end
+	end
+	local function sh(o)
+		if o:IsA("BasePart")or o:IsA("MeshPart")then o.Size=Vector3.new(.1,.1,.1)o.Transparency=1 o.CanCollide=false end
+		if o:IsA("SpecialMesh")or o:IsA("BlockMesh")then o.Scale=Vector3.new(.01,.01,.01)end
+	end
+	for _,v in ipairs(vt:GetDescendants())do pcall(function()sh(v)end)end
+	pcall(function()sh(vt)end)
+	return vt
+end
+local function CVF(tg)
+	if not vt or not tg then return end
+	local nv=vt:Clone()nv.Name="SupernovaVFX" nv.Parent=workspace
+	local ap=tg:FindFirstChild("Attachment")or tg
+	if ap then nv:PivotTo(ap.CFrame)else nv:PivotTo(tg:GetPivot())end
+	local vd={vfx=nv,target=tg,connection=nil}
+	vd.connection=RN.RenderStepped:Connect(function()
+		if not tg or not tg.Parent then
+			if vd.connection then vd.connection:Disconnect()end
+			pcall(function()if nv then nv:Destroy()end end)
+			for i,d in ipairs(avfx)do if d==vd then table.remove(avfx,i)break end end
+			return
+		end
+		local a=tg:FindFirstChild("Attachment")or tg
+		if a and nv then nv:PivotTo(a.CFrame)end
+	end)
+	table.insert(avfx,vd)
+end
+local function wSN(char)
+	local sa=char:FindFirstChild("SetAssets")or char:WaitForChild("SetAssets",5)
+	if not sa then return end
+	for _,c in ipairs(sa:GetChildren())do if c.Name=="Supernova" then task.wait(.05)CVF(c)end end
+	sa.ChildAdded:Connect(function(o)if o.Name=="Supernova" then task.wait(.05)CVF(o)end end)
+	sa.ChildRemoved:Connect(function(o)
+		if o.Name~="Supernova" then return end
+		for i,d in ipairs(avfx)do
+			if d.target==o then
+				if d.connection then d.connection:Disconnect()end
+				pcall(function()if d.vfx then d.vfx:Destroy()end end)
+				table.remove(avfx,i)break
+			end
+		end
+	end)
+end
+local function wBE()
+	local eff=workspace:FindFirstChild("Effects")or workspace:WaitForChild("Effects",10)
+	local G=Color3.fromRGB(80,80,80)
+	local function mg(inst)
+		for _,v in ipairs(inst:GetDescendants())do pcall(function()
+			if v:IsA("BasePart")or v:IsA("MeshPart")then v.Color=G v.Material=Enum.Material.SmoothPlastic end
+			if v:IsA("ParticleEmitter")then v.Color=ColorSequence.new(G)end
+			if v:IsA("PointLight")or v:IsA("SpotLight")then v.Color=G end
+			if v:IsA("Beam")then v.Color=ColorSequence.new(G)end
+		end)end
+		if inst:IsA("BasePart")or inst:IsA("MeshPart")then inst.Color=G end
+	end
+	local be=eff:FindFirstChild("BloodExplode")if be then mg(be)end
+	eff.ChildAdded:Connect(function(c)if c.Name=="BloodExplode" then task.wait(.05)mg(c)end end)
+end
+local function MB(o)
+	for _,v in pairs(o:GetDescendants())do pcall(function()
+		if v:IsA("BasePart")or v:IsA("MeshPart")then v.Color=BLK end
+		if v:IsA("ParticleEmitter")then v.Color=ColorSequence.new(BLK)end
+		if v:IsA("PointLight")or v:IsA("SpotLight")then v.Color=BLK end
+		if v:IsA("Beam")then v.Color=ColorSequence.new(BLK)end
+		if v:IsA("Trail")then v.Color=ColorSequence.new(BLK)end
+		if v:IsA("Smoke")then v.Color=BLK end
+		if v:IsA("Fire")then v.Color=BLK v.SecondaryColor=BLK end
+		if v:IsA("SurfaceAppearance")then v:Destroy()end
+		if v:IsA("Texture")or v:IsA("Decal")then v.Color3=BLK end
+	end)end
+	if o:IsA("BasePart")or o:IsA("MeshPart")then o.Color=BLK end
+end
+local function wCV(char)
+	if sac then sac:Disconnect()sac=nil end
+	local sa=char:WaitForChild("SetAssets",10)if not sa then return end
+	local ex=sa:FindFirstChild("Convergence")if ex then MB(ex)end
+	sac=sa.ChildAdded:Connect(function(child)
+		if child.Name~="Convergence" then return end
+		task.wait()MB(child)
+		child.DescendantAdded:Connect(function(d)
+			task.wait()pcall(function()
+				if d:IsA("BasePart")or d:IsA("MeshPart")then d.Color=BLK end
+				if d:IsA("ParticleEmitter")then d.Color=ColorSequence.new(BLK)end
+				if d:IsA("PointLight")or d:IsA("SpotLight")then d.Color=BLK end
+				if d:IsA("Beam")then d.Color=ColorSequence.new(BLK)end
+				if d:IsA("Trail")then d.Color=ColorSequence.new(BLK)end
+				if d:IsA("Smoke")then d.Color=BLK end
+				if d:IsA("Fire")then d.Color=BLK d.SecondaryColor=BLK end
+				if d:IsA("SurfaceAppearance")then d:Destroy()end
+				if d:IsA("Texture")or d:IsA("Decal")then d.Color3=BLK end
+			end)
+		end)
+	end)
+end
+local function iM(o)
+	local c=pl.Character if not c then return false end
+	local r=c:FindFirstChild("HumanoidRootPart")if not r then return false end
+	for _,v in ipairs(o:GetDescendants())do if(v:IsA("BasePart")or v:IsA("MeshPart"))and(v.Position-r.Position).Magnitude<15 then return true end end
+	if o:IsA("BasePart")and(o.Position-r.Position).Magnitude<15 then return true end
+	return false
+end
+local function col(o,c)
+	for _,v in ipairs(o:GetDescendants())do pcall(function()
+		if v:IsA("BasePart")or v:IsA("MeshPart")then v.Color=c end
+		if v:IsA("ParticleEmitter")then v.Color=ColorSequence.new(c)end
+		if v:IsA("PointLight")or v:IsA("SpotLight")then v.Color=c end
+		if v:IsA("Beam")then v.Color=ColorSequence.new(c)end
+	end)end
+	if o:IsA("BasePart")or o:IsA("MeshPart")then o.Color=c end
+end
+local function sMod(cf)
+	local m=game:GetObjects(MID)[1]if not m then return end
+	m.Parent=workspace
+	local pt=m:IsA("Model")and(m.PrimaryPart or(function()m.PrimaryPart=m:FindFirstChildWhichIsA("BasePart")return m.PrimaryPart end)())or(m:IsA("BasePart")and m)
+	if not pt then return end
+	pt.CFrame=cf*CFrame.Angles(0,0,math.rad(90))
+	local len=80
+	pt.Size=Vector3.new(pt.Size.X,pt.Size.Y,len)
+	local dur=len/200
+	local st=pt.CFrame
+	local gl=st*CFrame.new(0,0,-len)
+	local t=0
+	local con
+	con=RN.RenderStepped:Connect(function(dt)
+		t=t+dt
+		local a=math.clamp(t/dur,0,1)
+		local ncf=st:Lerp(gl,a)
+		if m:IsA("Model")then m:SetPrimaryPartCFrame(ncf)else pt.CFrame=ncf end
+		if a>=1 then con:Disconnect()end
+	end)
+	DB:AddItem(m,3)
+end
+local function stFW()
+	if fw then fw:Disconnect()end
+	fw=workspace.DescendantAdded:Connect(function(d)if d.Name=="Flash"and playing then pcall(function()d:Destroy()end)end end)
+end
+local function spFW()if fw then fw:Disconnect()fw=nil end end
+local function sRep(char)
+	local hum=char:FindFirstChildOfClass("Humanoid")if not hum then return end
+	local an=hum:WaitForChild("Animator")
+	an.AnimationPlayed:Connect(function(t)
+		if t.Animation.AnimationId~=pbAnim.AnimationId or playing then return end
+		playing=true stFW()
+		local wcs=an:LoadAnimation(wcsAnim)
+		wcs.Priority=Enum.AnimationPriority.Action4 wcs:Play(0)
+		local e=0
+		while wcs.IsPlaying and e<1 do e=e+RN.RenderStepped:Wait()end
+		if wcs.IsPlaying then wcs:AdjustSpeed(0)end
+		t.Stopped:Connect(function()task.wait(.5)wcs:Stop(0)playing=false spFW()end)
+	end)
+end
+ef.ChildAdded:Connect(function(c)
+	task.wait()
+	if not iM(c)then return end
+	if c.Name=="PiercingBlood" then
+		local cf
+		if c:IsA("BasePart")then cf=c.CFrame
+		elseif c:IsA("Model")and c.PrimaryPart then cf=c.PrimaryPart.CFrame
+		else local p=c:FindFirstChildWhichIsA("BasePart")if p then cf=p.CFrame end end
+		pcall(function()c:Destroy()end)
+		if cf then sMod(cf)end
+	elseif c.Name=="Flash" then pcall(function()c:Destroy()end)
+	elseif c.Name=="HitGlow" then col(c,RED)end
+end)
+print("inky")
+local function sFx(char)
+	local hum=char:WaitForChild("Humanoid")
+	local root=char:WaitForChild("HumanoidRootPart")
+	local head=char:WaitForChild("Head")
+	local s=Instance.new("Sound")s.SoundId=SID s.Volume=1 s.Parent=head
+	local t=hum:LoadAnimation(animPath)t:Play()s:Play()
+	while t.TimePosition<.62 and t.IsPlaying do RN.RenderStepped:Wait()end
+	t:AdjustSpeed(0)
+	local pos=root.CFrame local frz=true local st=tick()
+	local con=RN.RenderStepped:Connect(function()
+		if hum.MoveDirection.Magnitude>.1 then frz=false end
+		if frz then root.CFrame=pos end
+	end)
+	repeat task.wait()until tick()-st>=1 or not frz
+	t:Stop()s:Stop()s:Destroy()con:Disconnect()
+end
+local function sM1V(char)
+	local hum=char:FindFirstChildOfClass("Humanoid")if not hum then return end
+	local anim=hum:WaitForChild("Animator")
+	local root=char:WaitForChild("HumanoidRootPart")
+	local cA={AN.Choso.Melee.Melee1,AN.Choso.Melee.Melee2,AN.Choso.Melee.Melee3,AN.Choso.Melee.Melee4}
+	local iA={AN.Itadori.MeleeUlt.Melee1,AN.Itadori.MeleeUlt.Melee2,AN.Itadori.MeleeUlt.Melee3,AN.Itadori.MeleeUlt.Melee4}
+	local cIds={}
+	for i,a in ipairs(cA)do if a then cIds[a.AnimationId]=i end end
+	local tracks={}
+	for i,a in ipairs(iA)do
+		if a then local t=anim:LoadAnimation(a)t.Priority=Enum.AnimationPriority.Action4 t.Looped=false tracks[i]=t end
+	end
+	local ma=false
+	anim.AnimationPlayed:Connect(function(track)
+		local idx=cIds[track.Animation.AnimationId]
+		if not idx then return end
+		track:Stop(0)
+		local t=tracks[((idx-1)%4)+1]
+		if t then t:Play(0)ma=true t.Stopped:Connect(function()ma=false end)end
+	end)
+	ef.ChildAdded:Connect(function(c)
+		if c.Name=="CombatTrail" then
+			task.wait()
+			local w=c:FindFirstChildOfClass("Weld")
+			if w and w.Part0 and w.Part0:IsDescendantOf(char)then pcall(function()c:Destroy()end)end
+		end
+	end)
+	local wd={}
+	local function wE(enemy)
+		if wd[enemy]then return end wd[enemy]=true
+		local eh=enemy:FindFirstChildOfClass("Humanoid")if not eh then return end
+		local lhp=eh.Health
+		eh:GetPropertyChangedSignal("Health"):Connect(function()
+			local nhp=eh.Health
+			if nhp<lhp and ma then
+				local er=enemy:FindFirstChild("HumanoidRootPart")
+				if er and(er.Position-root.Position).Magnitude<15 then
+					local et=enemy:FindFirstChild("Torso")or enemy:FindFirstChild("UpperTorso")
+					if et then sM1(et)end
+				end
+			end
+			lhp=nhp
+		end)
+	end
+	for _,ec in ipairs(ch:GetChildren())do if ec.Name~=pl.Name then wE(ec)end end
+	ch.ChildAdded:Connect(function(c)if c.Name~=pl.Name then task.wait(.1)wE(c)end end)
+end
+local function oxC(myRoot,targetRoot,animTrack)
+	if oxA then return end oxA=true
+	local char=ch:FindFirstChild(pl.Name)
+	local hum=char and char:FindFirstChildOfClass("Humanoid")
+	if not char or not hum then oxA=false return end
+	hum.PlatformStand=true
+	local ox=Instance.new("Part",workspace)
+	ox.Size=Vector3.new(5,4,8)ox.CanCollide=false ox.Anchored=true ox.CastShadow=false
+	local mesh=Instance.new("SpecialMesh",ox)
+	mesh.MeshType=Enum.MeshType.FileMesh
+	mesh.MeshId="rbxassetid://"..OM
+	mesh.TextureId="rbxassetid://"..OT
+	mesh.Scale=Vector3.new(1,1,1)
+	local ld=(Vector3.new(targetRoot.Position.X,myRoot.Position.Y,targetRoot.Position.Z)-myRoot.Position)
+	if ld.Magnitude<.1 then ld=myRoot.CFrame.LookVector end
+	ox.CFrame=CFrame.new(myRoot.Position-Vector3.new(0,2.5,0),myRoot.Position+ld)
+	local so=CFrame.new(0,5.2,0)
+	myRoot.CFrame=ox.CFrame*so
+	local welds={}
+	for _,part in ipairs(char:GetDescendants())do
+		if part:IsA("BasePart")and part.Name~="HumanoidRootPart" then
+			local w=Instance.new("WeldConstraint")w.Part0=myRoot w.Part1=part w.Parent=ox
+			table.insert(welds,w)
+		end
+	end
+	local mw=Instance.new("WeldConstraint")mw.Part0=ox mw.Part1=myRoot mw.Parent=ox table.insert(welds,mw)
+	local os2=Instance.new("Sound",ox)os2.SoundId=OS os2.Volume=5 os2.Pitch=1 os2:Play()
+	local sn=Instance.new("Sound",ox)sn.SoundId="rbxassetid://5992459802" sn.Volume=4 sn:Play()
+	task.wait(.05)ox.Anchored=false
+	local bv=Instance.new("BodyVelocity",ox)bv.MaxForce=Vector3.new(1e6,1e6,1e6)bv.Velocity=Vector3.new(0,0,0)
+	local bg=Instance.new("BodyGyro",ox)bg.MaxTorque=Vector3.new(1e6,1e6,1e6)bg.P=1e5 bg.D=1000
+	local hc
+	hc=RN.Heartbeat:Connect(function()
+		if not ox or not ox.Parent then hc:Disconnect()return end
+		local tcf=ox.CFrame*so
+		if(myRoot.Position-tcf.Position).Magnitude>1 then myRoot.CFrame=tcf myRoot.AssemblyLinearVelocity=ox.AssemblyLinearVelocity end
+	end)
+	local fd=Vector3.new(ld.X,0,ld.Z).Unit
+	bg.CFrame=CFrame.new(ox.Position,ox.Position+fd)
+	task.spawn(function()
+		while animTrack and animTrack.IsPlaying do
+			if not ox or not ox.Parent then break end
+			bv.Velocity=fd*85+Vector3.new(0,8,0)task.wait(.03)
+		end
+		hc:Disconnect()bv.Velocity=Vector3.new(0,0,0)
+		for _,w in ipairs(welds)do pcall(function()w:Destroy()end)end
+		if hum and hum.Parent then hum.PlatformStand=false end
+		myRoot.AssemblyLinearVelocity=Vector3.new(0,-5,0)
+		ox.Transparency=1
+		pcall(function()os2:Stop()os2:Destroy()end)
+		pcall(function()sn:Destroy()end)
+		pcall(function()ox:Destroy()end)
+		task.wait(.5)oxA=false
+	end)
+end
+local function sOx(char)
+	local root=char:WaitForChild("HumanoidRootPart")
+	local hum=char:FindFirstChildOfClass("Humanoid")
+	local animator=hum:WaitForChild("Animator")
+	oxA=false
+	animator.AnimationPlayed:Connect(function(animTrack)
+		if not animTrack.Animation then return end
+		if animTrack.Animation.AnimationId~=rsAnim.AnimationId then return end
+		local ct={}
+		for _,ec in ipairs(ch:GetChildren())do
+			if ec.Name==pl.Name then continue end
+			local eh=ec:FindFirstChildOfClass("Humanoid")
+			if eh then ct[ec.Name]=eh.Health end
+		end
+		task.spawn(function()
+			while animTrack.IsPlaying and not oxA do
+				for _,ec in ipairs(ch:GetChildren())do
+					if ec.Name==pl.Name then continue end
+					local eh=ec:FindFirstChildOfClass("Humanoid")
+					local er=ec:FindFirstChild("HumanoidRootPart")or ec:FindFirstChild("Torso")
+					if not eh or not er or eh.Health<=0 then continue end
+					if(root.Position-er.Position).Magnitude>5 then continue end
+					local id=ec.Name
+					if not ct[id]then ct[id]=eh.Health end
+					local prev=ct[id] local cur=eh.Health
+					if cur<prev and not oxA then oxC(root,er,animTrack)return end
+					ct[id]=cur
+				end
+				task.wait(.016)
+			end
+		end)
+	end)
+end
+local function sCN(char)
+	local hum=char:WaitForChild("Humanoid")
+	local animator=hum:WaitForChild("Animator")
+	local root=char:WaitForChild("HumanoidRootPart")
+	animator.AnimationPlayed:Connect(function(animTrack)
+		if not animTrack.Animation then return end
+		if animTrack.Animation.AnimationId~=cnAnim.AnimationId then return end
+		local ra=char:FindFirstChild("Right Arm")or char:FindFirstChild("RightHand")or char:FindFirstChild("RightLowerArm")
+		v2s=false sCT()
+		local tr={}
+		for _,ec in ipairs(ch:GetChildren())do
+			if ec.Name~=pl.Name then
+				local eh=ec:FindFirstChildOfClass("Humanoid")
+				if eh then tr[ec]=eh.Health end
+			end
+		end
+		local conn
+		conn=RN.Heartbeat:Connect(function()
+			if not animTrack.IsPlaying then conn:Disconnect()xCT()v2s=false return end
+			for _,ec in ipairs(ch:GetChildren())do
+				if ec.Name==pl.Name then continue end
+				local eh=ec:FindFirstChildOfClass("Humanoid")
+				local er=ec:FindFirstChild("HumanoidRootPart")or ec:FindFirstChild("Torso")
+				if not eh or not er or eh.Health<=0 then continue end
+				if(root.Position-er.Position).Magnitude>15 then continue end
+				local prev=tr[ec]
+				if not prev then tr[ec]=eh.Health continue end
+				local cur=eh.Health
+				if cur<prev then
+					tr[ec]=cur
+					task.spawn(function()
+						if v2s then return end
+						local t=ec:FindFirstChild("Torso")or ec:FindFirstChild("UpperTorso")
+						if not t then return end
+						sV1(t)
+						task.delay(.5,function()
+							local t2=ec:FindFirstChild("Torso")or ec:FindFirstChild("UpperTorso")
+							if ra and ra.Parent then sV2(ra,t2)end
+						end)
+					end)
+				else tr[ec]=cur end
+			end
+		end)
+	end)
+end
+local function cBE(e)
+	if beMap[e]then for _,v in ipairs(beMap[e])do pcall(function()v:Destroy()end)end beMap[e]=nil end
+end
+local function cABE()for e in pairs(beMap)do cBE(e)end end
+local function sBEVfx(enemy)
+	cBE(enemy)
+	local torso=enemy:FindFirstChild("Torso")or enemy:FindFirstChild("UpperTorso")
+	if not torso then return end
+	local ok2,models=pcall(function()return game:GetObjects("rbxassetid://95176780992037")end)
+	if not(ok2 and models and #models>0)then return end
+	local vfx=models[1]
+	vfx.Parent=workspace
+	local rp=vfx:IsA("Model")and(vfx.PrimaryPart or vfx:FindFirstChildWhichIsA("BasePart"))or(vfx:IsA("BasePart")and vfx)
+	if rp then
+		rp.Anchored=false rp.CanCollide=false rp.CFrame=torso.CFrame
+		local w=Instance.new("WeldConstraint")w.Part0=torso w.Part1=rp w.Parent=rp
+		for _,v in ipairs(vfx:GetDescendants())do pcall(function()if v:IsA("BasePart")or v:IsA("MeshPart")then v.Anchored=false v.CanCollide=false end end)end
+	end
+	SS(rp or torso,"122951695254282",1)
+	beMap[enemy]={vfx}
+end
+local function rBE(char)
+	local sa=char:FindFirstChild("SetAssets")or char:WaitForChild("SetAssets",10)
+	if not sa then return end
+	for _,c in ipairs(sa:GetChildren())do if c.Name=="BloodEdge" then pcall(function()c:Destroy()end)end end
+	sa.ChildAdded:Connect(function(c)if c.Name=="BloodEdge" then task.wait()pcall(function()c:Destroy()end)end end)
+end
+local function sBE(char)
+	local hum=char:WaitForChild("Humanoid")
+	local animator=hum:WaitForChild("Animator")
+	local root=char:WaitForChild("HumanoidRootPart")
+	task.spawn(function()rBE(char)end)
+	animator.AnimationPlayed:Connect(function(animTrack)
+		if not animTrack.Animation then return end
+		if animTrack.Animation.AnimationId~=beAnim.AnimationId then return end
+		local tr={}
+		for _,ec in ipairs(ch:GetChildren())do
+			if ec.Name~=pl.Name then
+				local eh=ec:FindFirstChildOfClass("Humanoid")
+				if eh then tr[ec]=eh.Health end
+			end
+		end
+		local conn
+		conn=RN.Heartbeat:Connect(function()
+			if not animTrack.IsPlaying then conn:Disconnect()cABE()return end
+			for _,ec in ipairs(ch:GetChildren())do
+				if ec.Name==pl.Name then continue end
+				local eh=ec:FindFirstChildOfClass("Humanoid")
+				local er=ec:FindFirstChild("HumanoidRootPart")or ec:FindFirstChild("Torso")
+				if not eh or not er or eh.Health<=0 then continue end
+				if(root.Position-er.Position).Magnitude>5 then continue end
+				local prev=tr[ec]
+				if not prev then tr[ec]=eh.Health continue end
+				local cur=eh.Health
+				if cur<prev then
+					tr[ec]=cur
+					if not beMap[ec] then task.spawn(function()sBEVfx(ec)end)end
+				else tr[ec]=cur end
+			end
+		end)
+		animTrack.Stopped:Connect(function()cABE()end)
+	end)
+end
+local function applyUI()
+	local pg=pl:WaitForChild("PlayerGui",10)if not pg then return end
+	local mg=pg:WaitForChild("Main",5)if not mg then return end
+	local ms=mg:WaitForChild("Moveset",5)if not ms then return end
+	local names={["Piercing Blood"]="Dismantle",["Flowing Red Scale"]="🤠",["Supernova"]="Counter",["Blood Edge"]="Cleave"}
+	for sn,nn in pairs(names)do
+		local f=ms:FindFirstChild(sn)
+		if f then local b=f:FindFirstChild("ItemName")if b then b.Text=nn end end
+	end
+	local ult=mg:FindFirstChild("Ultimate")
+	if ult then
+		local title=ult:FindFirstChild("Title")if title then title.Text="Stand proud, you are strong" end
+		local function blackBar(frame)
+			if not frame then return end
+			local fill=frame:FindFirstChild("Fill")
+			if fill then
+				fill.BackgroundColor3=BLK
+				local g=fill:FindFirstChildOfClass("UIGradient")
+				if g then g.Color=ColorSequence.new(BLK)end
+			end
+			local g2=frame:FindFirstChildOfClass("UIGradient")
+			if g2 then g2.Color=ColorSequence.new(BLK)end
+		end
+		blackBar(ult:FindFirstChild("Bar"))
+		blackBar(ult:FindFirstChild("Special"))
+	end
+end
+local function setup(char)
+	playing=false spFW()c1()c2()xCT()v2s=false cABE()
+	sFx(char)task.wait(.5)
+	sRep(char)sM1V(char)sOx(char)sCN(char)sBE(char)
+	LVT()wSN(char)wBE()wCV(char)
+	task.wait(2)applyUI()
+end
+pl.CharacterAdded:Connect(function(c)task.wait(.1)setup(c)end)
+if pl.Character then task.spawn(function()setup(pl.Character)end)end
+print("Made by inquestor420")
